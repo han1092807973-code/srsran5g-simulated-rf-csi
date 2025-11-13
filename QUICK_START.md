@@ -6,24 +6,29 @@ This profile helps you extract partial CSI from SRS signals in your 5G NR simula
 
 ## Quick Steps
 
-### 1. Find the CSI Estimation Code
+### 1. Access the Scripts on Your Experimental Node
+
+After your POWDER experiment is deployed, the scripts are available at:
+- `/opt/csi_logging/` (or `~/csi_logging/` symlink)
+- `/local/repository/scripts/` (original profile repository)
+
+### 2. Find the CSI Estimation Code
 
 ```bash
-cd /path/to/srsran5g-simulated-rf
-./scripts/find_srs_csi_estimation.sh /opt/srsRAN_Project
+~/csi_logging/find_srs_csi_estimation.sh /opt/srsRAN_Project
 ```
 
 This will show you where SRS processing happens in srsRAN.
 
-### 2. Add CSI Logging
+### 3. Add CSI Logging
 
 1. **Copy the logger files** to srsRAN source:
    ```bash
-   cp scripts/csi_logger.h /opt/srsRAN_Project/lib/include/srsran/phy/upper/
-   cp scripts/csi_logger.cpp /opt/srsRAN_Project/lib/src/phy/upper/channel_processors/
+   cp ~/csi_logging/csi_logger.h /opt/srsRAN_Project/lib/include/srsran/phy/upper/
+   cp ~/csi_logging/csi_logger.cpp /opt/srsRAN_Project/lib/src/phy/upper/channel_processors/
    ```
 
-2. **Modify the SRS processor** to call the logger (see `INTEGRATION_GUIDE.md`)
+2. **Modify the SRS processor** to call the logger (see `~/csi_logging/INTEGRATION_GUIDE.md`)
 
 3. **Update CMakeLists.txt** to include `csi_logger.cpp`
 
@@ -34,27 +39,29 @@ This will show you where SRS processing happens in srsRAN.
    sudo make install
    ```
 
-### 3. Run Your Simulation
+### 4. Run Your Simulation
 
 Start gNodeB and UE as usual. CSI will be logged to `/tmp/csi_logs/`.
 
-### 4. Extract CSI Data
+### 5. Extract CSI Data
 
 ```bash
 # Analyze the logged CSI
-python3 scripts/extract_csi.py /tmp/csi_logs --analyze
+python3 ~/csi_logging/extract_csi.py /tmp/csi_logs --analyze
 
 # Export for research
-python3 scripts/extract_csi.py /tmp/csi_logs --export csi_data.npz
+python3 ~/csi_logging/extract_csi.py /tmp/csi_logs --export csi_data.npz
 ```
 
-## Files Created
+## Files Available on Experimental Node
 
-- `scripts/find_srs_csi_estimation.sh` - Locates SRS processing code
-- `scripts/add_csi_logging.sh` - Generates modification instructions
-- `scripts/csi_logger.h` - CSI logger header
-- `scripts/csi_logger.cpp` - CSI logger implementation
-- `scripts/extract_csi.py` - Analysis tool for logged CSI
+All scripts are automatically copied to `/opt/csi_logging/` during deployment:
+
+- `find_srs_csi_estimation.sh` - Locates SRS processing code
+- `add_csi_logging.sh` - Generates modification instructions
+- `csi_logger.h` - CSI logger header
+- `csi_logger.cpp` - CSI logger implementation
+- `extract_csi.py` - Analysis tool for logged CSI
 - `CSI_LOGGING_README.md` - Detailed documentation
 - `INTEGRATION_GUIDE.md` - Step-by-step integration instructions
 

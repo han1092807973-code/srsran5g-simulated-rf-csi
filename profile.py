@@ -151,6 +151,18 @@ tourInstructions += \
     """
 Note: When ZMQ is used by srsRAN to pass IQ samples, if you restart either of the `gnb` or `srsue` processes, you must restart the other as well.
 
+## CSI Logging for Research
+
+This profile includes CSI logging tools for extracting partial CSI from SRS signals. The scripts are automatically deployed to `/opt/csi_logging/` (also available at `~/csi_logging/`).
+
+To use CSI logging:
+1. Find SRS processing code: `~/csi_logging/find_srs_csi_estimation.sh /opt/srsRAN_Project`
+2. Follow the integration guide: `cat ~/csi_logging/INTEGRATION_GUIDE.md`
+3. Modify srsRAN source code and rebuild
+4. CSI will be logged to `/tmp/csi_logs/` during simulation
+
+See `~/csi_logging/QUICK_START.md` for details.
+
 You can find more information about the open source 5G software used in this profile at:
 
 https://open5gs.org

@@ -1,0 +1,53 @@
+---
+# Ansible playbook to set up CSI logging scripts on the experimental node
+# This makes the CSI logging tools available after deployment
+# The profile repository is available at /local/repository on POWDER nodes
+
+- name: Setup CSI logging tools
+  hosts: all
+  become: true
+  tasks:
+    - name: Create CSI logging directory
+      file:
+        path: /opt/csi_logging
+        state: directory
+        mode: '0755'
+
+    - name: Copy CSI logging files from repository
+      shell: |
+        REPO_DIR="/local/repository"
+        DEST_DIR="/opt/csi_logging"
+        
+        # Copy scripts
+        if [ -d "$REPO_DIR/scripts" ]; then
+          cp -r "$REPO_DIR/scripts"/* "$DEST_DIR/" 2>/dev/null || true
+          chmod +x "$DEST_DIR"/*.sh "$DEST_DIR"/*.py 2>/dev/null || true
+        fi
+        
+        # Copy documentation
+        if [ -f "$REPO_DIR/CSI_LOGGING_README.md" ]; then
+          cp "$REPO_DIR/CSI_LOGGING_README.md" "$DEST_DIR/" 2>/dev/null || true
+        fi
+        if [ -f "$REPO_DIR/QUICK_START.md" ]; then
+          cp "$REPO_DIR/QUICK_START.md" "$DEST_DIR/" 2>/dev/null || true
+        fi
+        if [ -f "$REPO_DIR/DEPLOYMENT.md" ]; then
+          cp "$REPO_DIR/DEPLOYMENT.md" "$DEST_DIR/" 2>/dev/null || true
+        fi
+      args:
+        creates: /opt/csi_logging/find_srs_csi_estimation.sh
+
+    - name: Create CSI logs directory
+      file:
+        path: /tmp/csi_logs
+        state: directory
+        mode: '1777'  # Sticky bit so all users can write
+
+    - name: Create symlink for easy access in home directory
+      file:
+        src: /opt/csi_logging
+        dest: "{{ ansible_env.HOME }}/csi_logging"
+        state: link
+      when: ansible_env.HOME is defined
+      ignore_errors: yes
+
